@@ -9,7 +9,7 @@ $(document).ready(function () {
   // Function to perform search
   function search(searchText) {
     $.ajax({
-      url: "https://coding.itcareerswitch.co.uk/companydirectory/libs/php/searchAll.php",
+      url: "libs/php/searchAll.php",
       type: "GET",
       dataType: "json",
       data: {
@@ -130,7 +130,7 @@ $(document).ready(function () {
   function fetchPersonnelData(personnelId) {
     console.log("Fetching personnel data for ID:", personnelId);
     $.ajax({
-      url: "https://coding.itcareerswitch.co.uk/companydirectory/libs/php/getPersonnelByID.php",
+      url: "libs/php/getPersonnelByID.php",
       type: "POST",
       dataType: "json",
       data: {
