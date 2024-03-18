@@ -18,7 +18,7 @@ $(document).ready(function () {
       success: function (result) {
         // Handle search results
         // Update table or display search results as per your requirement
-        console.log("Search result:", result);
+        console.log("Search results:", result);
       },
       error: function (jqXHR, textStatus, errorThrown) {
         console.error("Error searching:", errorThrown);
@@ -85,12 +85,14 @@ $(document).ready(function () {
   function refreshTable(tableName) {
     // Refresh table logic based on tableName
     // Implement table refresh logic
+    fetchData(); // Call the fetchData function to fetch and display data
   }
 
   // Function to open add modal
   function openAddModal(tableName) {
     // Open add modal logic based on tableName
     // Implement add modal opening logic
+    $("#addPersonnelModal").modal("show");
   }
 
   $("#addDepartmentForm").on("submit", function (e) {
