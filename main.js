@@ -130,7 +130,6 @@ $(document).ready(function () {
 
   // Function to fetch personnel data for editing
   function fetchPersonnelData(personnelId) {
-    console.log("Fetching personnel data for ID:", personnelId);
     $.ajax({
       url: "libs/php/getPersonnelByID.php",
       type: "POST",
@@ -202,9 +201,42 @@ $(document).ready(function () {
       dataType: "json",
       success: function (response) {
         if (response.status.code === "200") {
-          // Department data retrieval successful
-          // You can handle department data here as per your requirement
-          console.log("Department data:", response.data);
+          var tableBody = $("#departmentTableBody");
+
+          // Clear existing data from the table
+          tableBody.empty();
+
+          // Iterate through the data and create table rows
+          response.data.forEach(function (department) {
+            var row = $("<tr>");
+            row.append($("<td>").text(department.name));
+
+            // Create buttons column
+            var buttonsCell = $("<td>").addClass("text-end text-nowrap");
+            var editButton = $("<button>")
+              .addClass("btn btn-primary btn-sm")
+              .attr({
+                type: "button",
+                "data-bs-toggle": "modal",
+                "data-bs-target": "#editPersonnelModal",
+                "data-id": department.id, // Assuming person.id represents the unique identifier of each personnel
+              })
+              .html('<i class="fa-solid fa-pencil fa-fw"></i>');
+            var deleteButton = $("<button>")
+              .addClass("btn btn-primary btn-sm deletePersonnelBtn")
+              .attr("type", "button")
+              .attr("data-id", department.id) // Assuming person.id represents the unique identifier of each personnel
+              .html('<i class="fa-solid fa-trash fa-fw"></i>');
+
+            // Append buttons to buttonsCell
+            buttonsCell.append(editButton).append(deleteButton);
+
+            // Append the buttonsCell to the row
+            row.append(buttonsCell);
+
+            // Append the row to the table body
+            tableBody.append(row);
+          });
         } else {
           // Handle other status codes if needed
           console.error("Error: " + response.status.description);
