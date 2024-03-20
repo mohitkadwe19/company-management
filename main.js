@@ -182,6 +182,7 @@ $(document).ready(function () {
           // Data retrieval successful
           displayData(response.data); // Call function to display data
           fetchDepartments(); // Call function to fetch departments
+          fetchLocation(); // Call function to fetch locations
         } else {
           // Handle other status codes if needed
           console.error("Error: " + response.status.description);
@@ -226,6 +227,61 @@ $(document).ready(function () {
               .addClass("btn btn-primary btn-sm deletePersonnelBtn")
               .attr("type", "button")
               .attr("data-id", department.id) // Assuming person.id represents the unique identifier of each personnel
+              .html('<i class="fa-solid fa-trash fa-fw"></i>');
+
+            // Append buttons to buttonsCell
+            buttonsCell.append(editButton).append(deleteButton);
+
+            // Append the buttonsCell to the row
+            row.append(buttonsCell);
+
+            // Append the row to the table body
+            tableBody.append(row);
+          });
+        } else {
+          // Handle other status codes if needed
+          console.error("Error: " + response.status.description);
+        }
+      },
+      error: function (xhr, status, error) {
+        // Handle error response
+        console.error("Error: " + error);
+      },
+    });
+  }
+
+  function fetchLocation() {
+    $.ajax({
+      url: "libs/php/getAllLocations.php",
+      type: "GET",
+      dataType: "json",
+      success: function (response) {
+        if (response.status.code === "200") {
+          var tableBody = $("#locationTableBody");
+
+          // Clear existing data from the table
+          tableBody.empty();
+
+          // Iterate through the data and create table rows
+          response.data.forEach(function (location) {
+            var row = $("<tr>");
+            row.append($("<td>").text(location.name));
+
+            // Create buttons column
+            var buttonsCell = $("<td>").addClass("text-end text-nowrap");
+            var editButton = $("<button>")
+              .addClass("btn btn-primary btn-sm")
+              .attr({
+                type: "button",
+                "data-bs-toggle": "modal",
+                "data-bs-target": "#editPersonnelModal",
+                "data-id": location.id, // Assuming person.id represents the unique identifier of each personnel
+              })
+              .html('<i class="fa-solid fa-pencil fa-fw"></i>');
+            var deleteButton = $("<button>")
+              .addClass("btn btn-primary btn-sm deletePersonnelBtn")
+              .attr("type", "button")
+              .attr("data-id", location.id) // Assuming person.id represents the unique identifier of each personnel
               .html('<i class="fa-solid fa-trash fa-fw"></i>');
 
             // Append buttons to buttonsCell
