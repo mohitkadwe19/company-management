@@ -32,13 +32,11 @@ if (mysqli_connect_errno()) {
 }
 
 // SQL statement accepts parameters and so is prepared to avoid SQL injection.
-// $_REQUEST used for development / debugging. Remember to change to $_POST for production
 
-// need to locationName and locationID
-
-$query = $conn->prepare('SELECT d.id, d.name, l.name as locationName , l.id as locationId FROM department d LEFT JOIN location l ON (l.id = d.locationID) WHERE d.id = ?');
+$query = $conn->prepare('SELECT id, name FROM location WHERE id = ?');
 
 $query->bind_param("i", $_REQUEST['id']);
+
 
 $query->execute();
 
