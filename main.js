@@ -801,9 +801,18 @@ $(document).ready(function () {
 
   $("#filterLocationsForm").on("submit", function (e) {
     e.preventDefault();
+
     // Gather form data
+    var filterName = $("#filterLocationsName").val().trim();
+
+    // Validation: Ensure filterName is not empty
+    if (!filterName) {
+      alert("Please enter a filter name.");
+      return;
+    }
+
     var formData = {
-      filterName: $("#filterLocationsName").val(),
+      filterName: filterName,
     };
 
     // Make API call to filter location data
@@ -813,21 +822,25 @@ $(document).ready(function () {
       dataType: "json",
       data: formData,
       success: function (response) {
-        if (response.status.code === "200") {
+        if (response && response.status && response.status.code === "200") {
           console.log("Locations filtered successfully");
           // Close the modal or handle success message
           $("#filterLocationsModal").modal("hide");
           displayData(response.data.locations, "locations");
         } else {
-          console.error(
-            "Error filtering locations: " + response.status.description
-          );
+          var errorMessage =
+            response && response.status
+              ? response.status.description
+              : "Unknown error";
+          console.error("Error filtering locations: " + errorMessage);
           // Handle error message display or other actions
+          alert("Error filtering locations: " + errorMessage);
         }
       },
       error: function (xhr, status, error) {
         console.error("Error filtering locations: " + error);
         // Handle error message display or other actions
+        alert("Error filtering locations: " + error);
       },
     });
   });
