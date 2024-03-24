@@ -767,10 +767,20 @@ $(document).ready(function () {
 
   $("#filterDepartmentsForm").on("submit", function (e) {
     e.preventDefault();
+
     // Gather form data
+    var filterName = $("#filterDepartmentsName").val().trim();
+    var filterLocation = $("#filterDepartmentsLocation").val().trim();
+
+    // Basic validation: At least one field should be filled out
+    if (!filterName && !filterLocation) {
+      console.error("Please fill out at least one field.");
+      return;
+    }
+
     var formData = {
-      filterName: $("#filterDepartmentsName").val(),
-      filterLocation: $("#filterDepartmentsLocation").val(),
+      filterName: filterName,
+      filterLocation: filterLocation,
     };
 
     // Make API call to filter department data
