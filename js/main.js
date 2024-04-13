@@ -5,7 +5,13 @@ $(document).ready(function () {
 
   $("#searchInp").on("keyup", function () {
     let searchText = $(this).val();
-    search(searchText, activeTab);
+    if (activeTab === "departments") {
+      searchDepartment(searchText, activeTab);
+    } else if (activeTab === "locations") {
+      searchLocation(searchText, activeTab);
+    } else {
+      search(searchText, activeTab);
+    }
   });
 
   // Function to perform search
@@ -15,14 +21,55 @@ $(document).ready(function () {
       type: "GET",
       dataType: "json",
       data: {
-        txt: searchText,
-        table: tableName,
+        query: searchText,
       },
       success: function (result) {
         // Handle search results
         // Update table or display search results as per your requirement
         console.log("Search results:", result);
-        displayData(result.data.found, tableName);
+        displayData(result.data, tableName);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.error("Error searching:", errorThrown);
+      },
+    });
+  }
+
+  // Function to perform search
+  function searchDepartment(searchText, tableName) {
+    $.ajax({
+      url: "libs/php/searchDepartment.php",
+      type: "GET",
+      dataType: "json",
+      data: {
+        name: searchText,
+      },
+      success: function (result) {
+        // Handle search results
+        // Update table or display search results as per your requirement
+        console.log("Search results:", result);
+        displayData(result.data, tableName);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.error("Error searching:", errorThrown);
+      },
+    });
+  }
+
+  // Function to perform search
+  function searchLocation(searchText, tableName) {
+    $.ajax({
+      url: "libs/php/searchLocation.php",
+      type: "GET",
+      dataType: "json",
+      data: {
+        name: searchText,
+      },
+      success: function (result) {
+        // Handle search results
+        // Update table or display search results as per your requirement
+        console.log("Search results:", result);
+        displayData(result.data, tableName);
       },
       error: function (jqXHR, textStatus, errorThrown) {
         console.error("Error searching:", errorThrown);
@@ -469,71 +516,78 @@ $(document).ready(function () {
     // Clear existing data from the table
     tableBody.empty();
 
+    // Build the HTML for all rows
+    var html = "";
+
     // Iterate through the data and create table rows
     data.forEach(function (item) {
-      var row = $("<tr>");
+      var row = "<tr>";
       // Customize the data display based on your table structure
       // For example, if your data object has properties like item.firstName, item.lastName, item.jobTitle, item.email, etc.
       // You can display them in appropriate table cells here
       if (tableName === "personnel") {
-        row.append($("<td>").text(item.firstName));
-        row.append($("<td>").text(item.lastName));
-        row.append($("<td>").text(item.email));
-        row.append($("<td>").text(item.department));
-        row.append($("<td>").text(item.location));
-        row.append(
-          $("<td>").append(
-            `<button type="button" class="btn btn-primary btn-sm editPersonnelBtn" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="${item.id}">
-              <i class="fa-solid fa-pencil fa-fw"></i>
-            </button>`
-          )
-        );
-
-        row.append(
-          $("<td>").append(
-            `<button type="button" class="btn btn-primary btn-sm deletePersonnelBtn" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="${item.id}">
-              <i class="fa-solid fa-trash fa-fw"></i>
-            </button>`
-          )
-        );
+        // check if item.firstName and item.lastName are not null
+        if (item.firstName != null || item.lastName != null) {
+          row += "<td>" + (item?.firstName + " " + item?.lastName) + "</td>";
+        } else {
+          row += "<td>-</td>";
+        }
+        row += "<td>" + (item.jobTitle ? item.jobTitle : "-") + "</td>";
+        row += "<td>" + (item.email ? item.email : "-") + "</td>";
+        row +=
+          "<td>" + (item.departmentName ? item.departmentName : "-") + "</td>";
+        row += "<td>" + (item.locationName ? item.locationName : "-") + "</td>";
+        row += `
+                <td>
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary btn-sm me-1 editPersonnelBtn" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="${item.id}">
+                            <i class="fa-solid fa-pencil fa-fw"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm me-1 deletePersonnelBtn" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="${item.id}">
+                            <i class="fa-solid fa-trash fa-fw"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
       } else if (tableName === "departments") {
-        row.append($("<td>").text(item.departmentName));
-        row.append($("<td>").text(item.locationName));
-        row.append(
-          $("<td>").append(
-            `<button type="button" class="btn btn-primary btn-sm editDepartmentBtn" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" data-id="${item.id}">
-              <i class="fa-solid fa-pencil fa-fw"></i>
-            </button>`
-          )
-        );
-        row.append(
-          $("<td>").append(
-            `<button type="button" class="btn btn-primary btn-sm deleteDepartmentBtn" data-bs-toggle="modal" data-bs-target="#deleteDepartmentModal" data-id="${item.id}">
-                <i class="fa-solid fa-trash fa-fw"></i>
-                </button>`
-          )
-        );
+        row +=
+          "<td>" + (item.departmentName ? item.departmentName : "-") + "</td>";
+        row += "<td>" + (item.locationName ? item.locationName : "-") + "</td>";
+        row += `
+                <td>
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary btn-sm me-1 editDepartmentBtn" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" data-id="${item.id}">
+                            <i class="fa-solid fa-pencil fa-fw"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm me-1 deleteDepartmentBtn" data-bs-toggle="modal" data-bs-target="#deleteDepartmentModal" data-id="${item.id}">
+                            <i class="fa-solid fa-trash fa-fw"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
       } else if (tableName === "locations") {
-        row.append($("<td>").text(item.locationName));
-        row.append(
-          $("<td>").append(
-            `<button type="button" class="btn btn-primary btn-sm editLocationBtn" data-bs-toggle="modal" data-bs-target="#editLocationModal" data-id="${item.id}">
-            <i class="fa-solid fa-pencil fa-fw"></i>
-          </button>`
-          )
-        );
-        row.append(
-          $("<td>").append(
-            `<button type="button" class="btn btn-primary btn-sm deleteLocationBtn" data-bs-toggle="modal" data-bs-target="#deleteLocationModal" data-id="${item.id}">
-            <i class="fa-solid fa-trash fa-fw"></i>
-          </button>`
-          )
-        );
+        row += "<td>" + (item.locationName ? item.locationName : "-") + "</td>";
+        row += `
+                <td>
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary btn-sm me-1 editLocationBtn" data-bs-toggle="modal" data-bs-target="#editLocationModal" data-id="${item.id}">
+                            <i class="fa-solid fa-pencil fa-fw"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm me-1 deleteLocationBtn" data-bs-toggle="modal" data-bs-target="#deleteLocationModal" data-id="${item.id}">
+                            <i class="fa-solid fa-trash fa-fw"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
       }
+      row += "</tr>";
 
-      // Append the row to the table body
-      tableBody.append(row);
+      // Append the row to the HTML
+      html += row;
     });
+
+    // Append all rows to the table body
+    tableBody.append(html);
   }
 
   // Fetch initial data
@@ -542,7 +596,19 @@ $(document).ready(function () {
   // delete department by id
   $(document).on("click", ".deleteDepartmentBtn", function () {
     let departmentId = $(this).data("id");
-    deleteDepartment(departmentId);
+    // when we click on the delete open modal dialog
+    // change remove_modal_title
+    // change remove_modal_confirm_button event handler
+    $("#areYouSureDeleteModal")
+      .find("#remove_modal_title")
+      .text("Delete Department");
+    $("#areYouSureDeleteModal")
+      .find("#remove_modal_confirm_button")
+      .off("click")
+      .on("click", function () {
+        deleteDepartment(departmentId);
+      });
+    $("#areYouSureDeleteModal").modal("show");
   });
 
   function deleteDepartment(departmentId) {
@@ -559,6 +625,11 @@ $(document).ready(function () {
           console.error(
             "Error deleting department: " + response.status.description
           );
+          // show error message errorMessageModal dialog
+          $("#errorMessageModal")
+            .find("#error_message")
+            .text(response.status.description);
+          $("#errorMessageModal").modal("show");
         }
       },
       error: function (xhr, status, error) {
@@ -570,7 +641,19 @@ $(document).ready(function () {
   // delete location by id
   $(document).on("click", ".deleteLocationBtn", function () {
     let locationId = $(this).data("id");
-    deleteLocation(locationId);
+    // when we click on the delete open modal dialog
+    // change remove_modal_title
+    // change remove_modal_confirm_button event handler
+    $("#areYouSureDeleteModal")
+      .find("#remove_modal_title")
+      .text("Delete Location");
+    $("#areYouSureDeleteModal")
+      .find("#remove_modal_confirm_button")
+      .off("click")
+      .on("click", function () {
+        deleteLocation(locationId);
+      });
+    $("#areYouSureDeleteModal").modal("show");
   });
 
   function deleteLocation(locationId) {
@@ -587,6 +670,11 @@ $(document).ready(function () {
           console.error(
             "Error deleting location: " + response.status.description
           );
+          // show error message errorMessageModal dialog
+          $("#errorMessageModal")
+            .find("#error_message")
+            .text(response.status.description);
+          $("#errorMessageModal").modal("show");
         }
       },
       error: function (xhr, status, error) {
@@ -598,7 +686,19 @@ $(document).ready(function () {
   // delete personnel by id
   $(document).on("click", ".deletePersonnelBtn", function () {
     let personnelId = $(this).data("id");
-    deletePersonnel(personnelId);
+    // when we click on the delete open modal dialog
+    // change remove_modal_title
+    // change remove_modal_confirm_button event handler
+    $("#areYouSureDeleteModal")
+      .find("#remove_modal_title")
+      .text("Delete Personnel");
+    $("#areYouSureDeleteModal")
+      .find("#remove_modal_confirm_button")
+      .off("click")
+      .on("click", function () {
+        deletePersonnel(personnelId);
+      });
+    $("#areYouSureDeleteModal").modal("show");
   });
 
   function deletePersonnel(personnelId) {
@@ -769,8 +869,8 @@ $(document).ready(function () {
     e.preventDefault();
 
     // Gather form data
-    var filterName = $("#filterDepartmentsName").val().trim();
-    var filterLocation = $("#filterDepartmentsLocation").val().trim();
+    var filterName = $("#filterDepartmentName").val().trim();
+    var filterLocation = $("#filterDepartmentLocation").val().trim();
 
     // Basic validation: At least one field should be filled out
     if (!filterName && !filterLocation) {
@@ -813,7 +913,7 @@ $(document).ready(function () {
     e.preventDefault();
 
     // Gather form data
-    var filterName = $("#filterLocationsName").val().trim();
+    var filterName = $("#filterLocationName").val().trim();
 
     // Validation: Ensure filterName is not empty
     if (!filterName) {

@@ -29,7 +29,7 @@ if (mysqli_connect_errno()) {
 
 // Function to filter locations based on criteria
 function filterLocations($conn, $filterName) {
-    $sql = "SELECT * FROM location WHERE 1";
+    $sql = "SELECT id, name FROM location WHERE 1";
 
     if (!empty($filterName)) {
         $sql .= " AND name LIKE '%$filterName%'";
