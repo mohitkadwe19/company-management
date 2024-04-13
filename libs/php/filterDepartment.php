@@ -28,13 +28,17 @@ if (mysqli_connect_errno()) {
 }   
 
 // Function to filter departments based on criteria
-function filterDepartments($conn, $filterLocation) {
-    $sql = "SELECT d.name AS departmentName, l.name AS locationName 
+function filterDepartments($conn, $filterName, $filterLocation) {
+    $sql = "SELECT d.name AS departmentName, d.locationID 
             FROM department d 
-            INNER JOIN location l ON d.locationID = l.id";
+            WHERE 1";
+
+    if (!empty($filterName)) {
+        $sql .= " AND d.name = '$filterName'";
+    }
 
     if (!empty($filterLocation)) {
-        $sql .= " WHERE d.locationID = $filterLocation";
+        $sql .= " AND d.locationID = $filterLocation";
     }
 
     $result = mysqli_query($conn, $sql);
@@ -48,11 +52,25 @@ function filterDepartments($conn, $filterLocation) {
     return $departments;
 }
 
+// Function to get location name from locationID
+function getLocationName($conn, $locationID) {
+    $sql = "SELECT name FROM location WHERE id = $locationID";
+    $result = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($result);
+    return $row['name'];
+}
+
 // Get filter criteria from request
+$filterName = isset($_GET['filterName']) ? $_GET['filterName'] : '';
 $filterLocation = isset($_GET['filterLocation']) ? $_GET['filterLocation'] : '';
 
 // Filter departments based on criteria
-$filteredDepartments = filterDepartments($conn, $filterLocation);
+$filteredDepartments = filterDepartments($conn, $filterName, $filterLocation);
+
+// Add locationName to each department in the response
+foreach ($filteredDepartments as &$department) {
+    $department['locationName'] = getLocationName($conn, $department['locationID']);
+}
 
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
@@ -63,5 +81,4 @@ $output['data']['departments'] = $filteredDepartments;
 mysqli_close($conn);
 
 echo json_encode($output); 
-
 ?>

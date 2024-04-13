@@ -1,70 +1,84 @@
 <?php
 
-	// example use from browser
-	// use insertDepartment.php first to create new dummy record and then specify it's id in the command below
-	// http://localhost/companydirectory/libs/php/deleteDepartmentByID.php?id=<id>
+// example use from browser
+// use insertDepartment.php first to create new dummy record and then specify its id in the command below
+// http://localhost/companydirectory/libs/php/deleteDepartmentByID.php?id=<id>
 
-	// remove next two lines for production
-	
-	ini_set('display_errors', 'On');
-	error_reporting(E_ALL);
+// remove next two lines for production
 
-	$executionStartTime = microtime(true);
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
 
-	include("config.php");
+$executionStartTime = microtime(true);
 
-	header('Content-Type: application/json; charset=UTF-8');
+include("config.php");
 
-	$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
+header('Content-Type: application/json; charset=UTF-8');
 
-	if (mysqli_connect_errno()) {
-		
-		$output['status']['code'] = "300";
-		$output['status']['name'] = "failure";
-		$output['status']['description'] = "database unavailable";
-		$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-		$output['data'] = [];
+$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 
-		mysqli_close($conn);
+if (mysqli_connect_errno()) {
 
-		echo json_encode($output);
+    $output['status']['code'] = "300";
+    $output['status']['name'] = "failure";
+    $output['status']['description'] = "database unavailable";
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
 
-		exit;
+    mysqli_close($conn);
 
-	}	
+    echo json_encode($output);
 
-	// SQL statement accepts parameters and so is prepared to avoid SQL injection.
-	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
+    exit;
+}
 
-	$query = $conn->prepare('DELETE FROM department WHERE id = ?');
-	
-	$query->bind_param("i", $_REQUEST['id']);
+// Check if the department is referenced in the personnel table
+$query = $conn->prepare('SELECT * FROM personnel WHERE departmentID = ?');
+$query->bind_param("i", $_REQUEST['id']);
+$query->execute();
+$result = $query->get_result();
 
-	$query->execute();
-	
-	if (false === $query) {
+if ($result->num_rows > 0) {
+    // Department is being used as a reference in the personnel table
+    $output['status']['code'] = "400";
+    $output['status']['name'] = "failure";
+    $output['status']['description'] = "Department is being used as a reference somewhere and cannot be deleted";
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
 
-		$output['status']['code'] = "400";
-		$output['status']['name'] = "executed";
-		$output['status']['description'] = "query failed";	
-		$output['data'] = [];
+    mysqli_close($conn);
 
-		mysqli_close($conn);
+    echo json_encode($output);
+    exit;
+}
 
-		echo json_encode($output); 
+// No dependencies found, proceed with deletion
+$query = $conn->prepare('DELETE FROM department WHERE id = ?');
+$query->bind_param("i", $_REQUEST['id']);
+$query->execute();
 
-		exit;
+if ($query === false) {
 
-	}
+    $output['status']['code'] = "400";
+    $output['status']['name'] = "executed";
+    $output['status']['description'] = "query failed";
+    $output['data'] = [];
 
-	$output['status']['code'] = "200";
-	$output['status']['name'] = "ok";
-	$output['status']['description'] = "success";
-	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-	$output['data'] = [];
-	
-	mysqli_close($conn);
+    mysqli_close($conn);
 
-	echo json_encode($output); 
+    echo json_encode($output);
+
+    exit;
+}
+
+$output['status']['code'] = "200";
+$output['status']['name'] = "ok";
+$output['status']['description'] = "success";
+$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+$output['data'] = [];
+
+mysqli_close($conn);
+
+echo json_encode($output);
 
 ?>

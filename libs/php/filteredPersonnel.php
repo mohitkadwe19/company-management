@@ -27,12 +27,19 @@ if (mysqli_connect_errno()) {
 
 }   
 
-// Function to filter personnel based on criteria
-function filterPersonnel($conn, $filterDepartment) {
-    $sql = "SELECT * FROM personnel WHERE 1";
+function filterPersonnel($conn, $filterDepartment, $filterName, $filterJobTitle) {
+    $sql = "SELECT id, firstName, lastName, jobTitle, email, departmentID FROM personnel WHERE 1";
 
     if (!empty($filterDepartment)) {
         $sql .= " AND departmentID = $filterDepartment";
+    }
+
+    if (!empty($filterName)) {
+        $sql .= " AND CONCAT(firstName, ' ', lastName) = '$filterName'";
+    }
+
+    if (!empty($filterJobTitle)) {
+        $sql .= " AND jobTitle = '$filterJobTitle'";
     }
 
     $result = mysqli_query($conn, $sql);
@@ -47,9 +54,11 @@ function filterPersonnel($conn, $filterDepartment) {
 
 // Get filter criteria from request
 $filterDepartment = isset($_GET['filterDepartment']) ? $_GET['filterDepartment'] : '';
+$filterName = isset($_GET['filterName']) ? $_GET['filterName'] : '';
+$filterJobTitle = isset($_GET['filterJobTitle']) ? $_GET['filterJobTitle'] : '';
 
 // Filter personnel based on criteria
-$filteredPersonnel = filterPersonnel($conn, $filterDepartment);
+$filteredPersonnel = filterPersonnel($conn, $filterDepartment, $filterName, $filterJobTitle);
 
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
@@ -60,5 +69,6 @@ $output['data']['personnel'] = $filteredPersonnel;
 mysqli_close($conn);
 
 echo json_encode($output); 
+
 
 ?>

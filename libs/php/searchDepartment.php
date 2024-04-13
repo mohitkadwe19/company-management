@@ -1,7 +1,7 @@
 <?php
 
     // example use from browser
-    // http://localhost/companydirectory/libs/php/getAllLocations.php
+    // http://localhost/companydirectory/libs/php/searchDepartmentByName.php?name=<search_query>
 
     // remove next two lines for production    
     
@@ -32,9 +32,23 @@
 
     }   
 
-    // SQL does not accept parameters and so is not prepared
+    // Check if the search query parameter is provided
+    if (isset($_GET['name'])) {
+        // Sanitize the search query parameter to prevent SQL injection
+        $searchQuery = $conn->real_escape_string($_GET['name']);
 
-    $query = 'SELECT id, name as locationName FROM location';
+        // SQL does not accept parameters and so is not prepared
+        $query = "SELECT department.id, department.name as departmentName, location.name as locationName 
+                  FROM department 
+                  LEFT JOIN location ON department.locationID = location.id 
+                  WHERE department.name LIKE '%$searchQuery%'";
+    } else {
+        // If no search query parameter is provided, return an empty result set
+        $query = "SELECT department.id, department.name as departmentName, location.name as locationName 
+                  FROM department 
+                  LEFT JOIN location ON department.locationID = location.id 
+                  WHERE 1 = 0";
+    }
 
     $result = $conn->query($query);
     
@@ -60,11 +74,6 @@
         array_push($data, $row);
 
     }
-
-    // Sort the data by location name
-    usort($data, function($a, $b) {
-        return strcmp($a['locationName'], $b['locationName']);
-    });
 
     $output['status']['code'] = "200";
     $output['status']['name'] = "ok";
