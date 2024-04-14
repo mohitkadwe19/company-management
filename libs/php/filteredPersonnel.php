@@ -12,7 +12,6 @@ header('Content-Type: application/json; charset=UTF-8');
 $conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 
 if (mysqli_connect_errno()) {
-    
     $output['status']['code'] = "300";
     $output['status']['name'] = "failure";
     $output['status']['description'] = "database unavailable";
@@ -24,22 +23,23 @@ if (mysqli_connect_errno()) {
     echo json_encode($output);
 
     exit;
-
 }   
 
-function filterPersonnel($conn, $filterDepartment, $filterName, $filterJobTitle) {
-    $sql = "SELECT id, firstName, lastName, jobTitle, email, departmentID FROM personnel WHERE 1";
+function filterPersonnel($conn, $filterDepartment, $filterLocation) {
+    $sql = "SELECT p.id, p.firstName, p.lastName, p.jobTitle, p.email, p.departmentID, d.name as departmentName, l.id as locationID, l.name as locationName
+            FROM personnel p
+            JOIN department d ON p.departmentID = d.id";
 
+    // If filterDepartment is provided, include it in the query
     if (!empty($filterDepartment)) {
-        $sql .= " AND departmentID = $filterDepartment";
-    }
-
-    if (!empty($filterName)) {
-        $sql .= " AND CONCAT(firstName, ' ', lastName) = '$filterName'";
-    }
-
-    if (!empty($filterJobTitle)) {
-        $sql .= " AND jobTitle = '$filterJobTitle'";
+        $sql .= " WHERE p.departmentID = $filterDepartment";
+        // If filterLocation is provided, include it in the query
+        if (!empty($filterLocation)) {
+            $sql .= " AND d.locationID = $filterLocation";
+        }
+    } elseif (!empty($filterLocation)) {
+        // If only filterLocation is provided, filter based on location only
+        $sql .= " JOIN location l ON d.locationID = l.id WHERE l.id = $filterLocation";
     }
 
     $result = mysqli_query($conn, $sql);
@@ -54,11 +54,10 @@ function filterPersonnel($conn, $filterDepartment, $filterName, $filterJobTitle)
 
 // Get filter criteria from request
 $filterDepartment = isset($_GET['filterDepartment']) ? $_GET['filterDepartment'] : '';
-$filterName = isset($_GET['filterName']) ? $_GET['filterName'] : '';
-$filterJobTitle = isset($_GET['filterJobTitle']) ? $_GET['filterJobTitle'] : '';
+$filterLocation = isset($_GET['filterLocation']) ? $_GET['filterLocation'] : '';
 
 // Filter personnel based on criteria
-$filteredPersonnel = filterPersonnel($conn, $filterDepartment, $filterName, $filterJobTitle);
+$filteredPersonnel = filterPersonnel($conn, $filterDepartment, $filterLocation);
 
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";
@@ -69,6 +68,4 @@ $output['data']['personnel'] = $filteredPersonnel;
 mysqli_close($conn);
 
 echo json_encode($output); 
-
-
 ?>

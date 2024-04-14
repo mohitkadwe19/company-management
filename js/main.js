@@ -26,7 +26,6 @@ $(document).ready(function () {
       success: function (result) {
         // Handle search results
         // Update table or display search results as per your requirement
-        console.log("Search results:", result);
         displayData(result.data, tableName);
       },
       error: function (jqXHR, textStatus, errorThrown) {
@@ -47,7 +46,6 @@ $(document).ready(function () {
       success: function (result) {
         // Handle search results
         // Update table or display search results as per your requirement
-        console.log("Search results:", result);
         displayData(result.data, tableName);
       },
       error: function (jqXHR, textStatus, errorThrown) {
@@ -68,7 +66,6 @@ $(document).ready(function () {
       success: function (result) {
         // Handle search results
         // Update table or display search results as per your requirement
-        console.log("Search results:", result);
         displayData(result.data, tableName);
       },
       error: function (jqXHR, textStatus, errorThrown) {
@@ -96,12 +93,12 @@ $(document).ready(function () {
         success: function (response) {
           if (response.status.code === "200") {
             let departmentData = response.data;
-            $("#filterPersonnelDepartment").empty();
+            let html = ""; // Variable to store HTML code
+            html += '<option value="">All</option>'; // Add the "All" option
             departmentData.forEach(function (department) {
-              $("#filterPersonnelDepartment").append(
-                `<option value="${department.id}">${department.departmentName}</option>`
-              );
+              html += `<option value="${department.id}">${department.departmentName}</option>`;
             });
+            $("#filterPersonnelDepartment").html(html); // Append HTML at once
           } else {
             console.error("Error: " + response.status.description);
           }
@@ -110,9 +107,7 @@ $(document).ready(function () {
           console.error("Error: " + error);
         },
       });
-    } else if (activeTab == "departments") {
-      $("#filterDepartmentsModal").modal("show");
-      // fetch locations data and add in the select options
+
       $.ajax({
         url: "libs/php/getAllLocations.php",
         type: "GET",
@@ -120,12 +115,12 @@ $(document).ready(function () {
         success: function (response) {
           if (response.status.code === "200") {
             let locationData = response.data;
-            $("#filterDepartmentLocation").empty();
+            let html = ""; // Variable to store HTML code
+            html += '<option value="">All</option>'; // Add the "All" option
             locationData.forEach(function (location) {
-              $("#filterDepartmentLocation").append(
-                `<option value="${location.id}">${location.locationName}</option>`
-              );
+              html += `<option value="${location.id}">${location.locationName}</option>`;
             });
+            $("#filterPersonnelLocation").html(html); // Append HTML at once
           } else {
             console.error("Error: " + response.status.description);
           }
@@ -134,8 +129,6 @@ $(document).ready(function () {
           console.error("Error: " + error);
         },
       });
-    } else if (activeTab == "locations") {
-      $("#filterLocationsModal").modal("show");
     }
   });
 
@@ -148,6 +141,15 @@ $(document).ready(function () {
   $("#personnelBtn, #departmentsBtn, #locationsBtn").click(function () {
     activeTab = $(this).attr("id").replace("Btn", "");
     refreshTable(activeTab);
+    if (activeTab == "departments") {
+      // disable filterBtn when activeTab is departments
+      $("#filterBtn").prop("disabled", true);
+    } else if (activeTab == "locations") {
+      // disable filterBtn when activeTab is locations
+      $("#filterBtn").prop("disabled", true);
+    } else {
+      $("#filterBtn").prop("disabled", false);
+    }
   });
 
   // Function to refresh table data
@@ -255,7 +257,6 @@ $(document).ready(function () {
       data: formData,
       success: function (response) {
         if (response.status.code === "200") {
-          console.log("Personnel data updated successfully");
           // Close the modal or handle success message
           $("#editPersonnelModal").modal("hide");
           refreshTable("personnel");
@@ -291,7 +292,6 @@ $(document).ready(function () {
       data: formData,
       success: function (response) {
         if (response.status.code === "200") {
-          console.log("Department data updated successfully");
           // Close the modal or handle success message
           $("#editDepartmentModal").modal("hide");
           refreshTable("departments");
@@ -326,7 +326,6 @@ $(document).ready(function () {
       data: formData,
       success: function (response) {
         if (response.status.code === "200") {
-          console.log("Location data updated successfully");
           // Close the modal or handle success message
           $("#editLocationModal").modal("hide");
           refreshTable("locations");
@@ -409,8 +408,6 @@ $(document).ready(function () {
         if (response.status.code === "200") {
           let personnelData = response.data.personnel[0];
           let departmentData = response.data.department;
-
-          console.log("Personnel data:", personnelData);
 
           // Populate the edit personnel form with the fetched data
           $("#editPersonnelEmployeeID").val(personnelData.id);
@@ -618,7 +615,6 @@ $(document).ready(function () {
       dataType: "json",
       success: function (response) {
         if (response.status.code === "200") {
-          console.log("Department deleted successfully");
           $("#deleteDepartmentModal").modal("hide");
           refreshTable("departments");
         } else {
@@ -663,7 +659,6 @@ $(document).ready(function () {
       dataType: "json",
       success: function (response) {
         if (response.status.code === "200") {
-          console.log("Location deleted successfully");
           $("#deleteLocationModal").modal("hide");
           refreshTable("locations");
         } else {
@@ -708,7 +703,6 @@ $(document).ready(function () {
       dataType: "json",
       success: function (response) {
         if (response.status.code === "200") {
-          console.log("Personnel deleted successfully");
           $("#deletePersonnelModal").modal("hide");
           refreshTable("personnel");
         } else {
@@ -740,7 +734,6 @@ $(document).ready(function () {
       data: formData,
       success: function (response) {
         if (response.status.code === "200") {
-          console.log("Department added successfully");
           // Close the modal or handle success message
           $("#addDepartmentModal").modal("hide");
           refreshTable("departments");
@@ -774,7 +767,6 @@ $(document).ready(function () {
       data: formData,
       success: function (response) {
         if (response.status.code === "200") {
-          console.log("Location added successfully");
           // Close the modal or handle success message
           $("#addLocationModal").modal("hide");
           refreshTable("locations");
@@ -812,7 +804,6 @@ $(document).ready(function () {
       data: formData,
       success: function (response) {
         if (response.status.code === "200") {
-          console.log("Personnel added successfully");
           // Close the modal or handle success message
           $("#addPersonnelModal").modal("hide");
           refreshTable("personnel");
@@ -834,9 +825,8 @@ $(document).ready(function () {
     e.preventDefault();
     // Gather form data
     var formData = {
-      filterName: $("#filterPersonnelName").val(),
-      filterJobTitle: $("#filterPersonnelJobTitle").val(),
       filterDepartment: $("#filterPersonnelDepartment").val(),
+      filterLocation: $("#filterPersonnelLocation").val(),
     };
 
     // Make API call to filter personnel data
@@ -847,7 +837,6 @@ $(document).ready(function () {
       data: formData,
       success: function (response) {
         if (response.status.code === "200") {
-          console.log("Personnel filtered successfully");
           // Close the modal or handle success message
           $("#filterPersonnelModal").modal("hide");
           displayData(response.data.personnel, "personnel");
@@ -861,96 +850,6 @@ $(document).ready(function () {
       error: function (xhr, status, error) {
         console.error("Error filtering personnel: " + error);
         // Handle error message display or other actions
-      },
-    });
-  });
-
-  $("#filterDepartmentsForm").on("submit", function (e) {
-    e.preventDefault();
-
-    // Gather form data
-    var filterName = $("#filterDepartmentName").val().trim();
-    var filterLocation = $("#filterDepartmentLocation").val().trim();
-
-    // Basic validation: At least one field should be filled out
-    if (!filterName && !filterLocation) {
-      console.error("Please fill out at least one field.");
-      return;
-    }
-
-    var formData = {
-      filterName: filterName,
-      filterLocation: filterLocation,
-    };
-
-    // Make API call to filter department data
-    $.ajax({
-      url: "libs/php/filterDepartment.php",
-      type: "GET",
-      dataType: "json",
-      data: formData,
-      success: function (response) {
-        if (response.status.code === "200") {
-          console.log("Departments filtered successfully");
-          // Close the modal or handle success message
-          $("#filterDepartmentsModal").modal("hide");
-          displayData(response.data.departments, "departments");
-        } else {
-          console.error(
-            "Error filtering departments: " + response.status.description
-          );
-          // Handle error message display or other actions
-        }
-      },
-      error: function (xhr, status, error) {
-        console.error("Error filtering departments: " + error);
-        // Handle error message display or other actions
-      },
-    });
-  });
-
-  $("#filterLocationsForm").on("submit", function (e) {
-    e.preventDefault();
-
-    // Gather form data
-    var filterName = $("#filterLocationName").val().trim();
-
-    // Validation: Ensure filterName is not empty
-    if (!filterName) {
-      alert("Please enter a filter name.");
-      return;
-    }
-
-    var formData = {
-      filterName: filterName,
-    };
-
-    // Make API call to filter location data
-    $.ajax({
-      url: "libs/php/filterLocation.php",
-      type: "GET",
-      dataType: "json",
-      data: formData,
-      success: function (response) {
-        if (response && response.status && response.status.code === "200") {
-          console.log("Locations filtered successfully");
-          // Close the modal or handle success message
-          $("#filterLocationsModal").modal("hide");
-          displayData(response.data.locations, "locations");
-        } else {
-          var errorMessage =
-            response && response.status
-              ? response.status.description
-              : "Unknown error";
-          console.error("Error filtering locations: " + errorMessage);
-          // Handle error message display or other actions
-          alert("Error filtering locations: " + errorMessage);
-        }
-      },
-      error: function (xhr, status, error) {
-        console.error("Error filtering locations: " + error);
-        // Handle error message display or other actions
-        alert("Error filtering locations: " + error);
       },
     });
   });
