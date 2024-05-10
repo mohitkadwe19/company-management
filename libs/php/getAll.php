@@ -30,7 +30,7 @@ if (mysqli_connect_errno()) {
     exit;
 }
 
-$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, p.departmentID, d.name as departmentName, d.locationID, l.name as locationName FROM personnel p LEFT JOIN department d ON (d.id = p.departmentID) LEFT JOIN location l ON (l.id = d.locationID) ORDER BY p.firstName';
+$query = 'SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, p.departmentID, d.name as departmentName, d.locationID, l.name as locationName FROM personnel p LEFT JOIN department d ON (d.id = p.departmentID) LEFT JOIN location l ON (l.id = d.locationID) ORDER BY p.lastName, p.firstName';
 
 $result = $conn->query($query);
 
@@ -55,11 +55,6 @@ while ($row = mysqli_fetch_assoc($result)) {
     array_push($data, $row);
 
 }
-
-// Sort the data by first name
-usort($data, function($a, $b) {
-    return strcmp($a['firstName'], $b['firstName']);
-});
 
 $output['status']['code'] = "200";
 $output['status']['name'] = "ok";

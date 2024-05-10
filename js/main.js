@@ -198,11 +198,12 @@ $(document).ready(function () {
           if (response.status.code === "200") {
             let departmentData = response.data;
             $("#addPersonnelDepartment").empty();
+            // store the option into variable and append at once
+            let option = "";
             departmentData.forEach(function (department) {
-              $("#addPersonnelDepartment").append(
-                `<option value="${department.id}">${department.departmentName}</option>`
-              );
+              option += `<option value="${department.id}">${department.departmentName}</option>`;
             });
+            $("#addPersonnelDepartment").html(option);
           } else {
             console.log("Error: " + response.status.description);
           }
@@ -222,11 +223,12 @@ $(document).ready(function () {
           if (response.status.code === "200") {
             let locationData = response.data;
             $("#addDepartmentLocation").empty();
+            // store the option in variable and append at once
+            let option = "";
             locationData.forEach(function (location) {
-              $("#addDepartmentLocation").append(
-                `<option value="${location.id}">${location.locationName}</option>`
-              );
+              option += `<option value="${location.id}">${location.locationName}</option>`;
             });
+            $("#addDepartmentLocation").html(option);
           } else {
             console.log("Error: " + response.status.description);
           }
@@ -429,23 +431,36 @@ $(document).ready(function () {
       success: function (response) {
         if (response.status.code === "200") {
           let personnelData = response.data.personnel[0];
-          let departmentData = response.data.department;
+          let departmentData = [];
 
-          // Populate the edit personnel form with the fetched data
-          $("#editPersonnelEmployeeID").val(personnelData.id);
-          $("#editPersonnelFirstName").val(personnelData.firstName);
-          $("#editPersonnelLastName").val(personnelData.lastName);
-          $("#editPersonnelJobTitle").val(personnelData.jobTitle);
-          $("#editPersonnelEmailAddress").val(personnelData.email);
+          $.ajax({
+            url: "libs/php/getAllDepartments.php",
+            type: "GET",
+            dataType: "json",
+            success: async function (response) {
+              if (response.status.code === "200") {
+                departmentData = await response.data;
+                // Populate the edit personnel form with the fetched data
+                $("#editPersonnelEmployeeID").val(personnelData.id);
+                $("#editPersonnelFirstName").val(personnelData.firstName);
+                $("#editPersonnelLastName").val(personnelData.lastName);
+                $("#editPersonnelJobTitle").val(personnelData.jobTitle);
+                $("#editPersonnelEmailAddress").val(personnelData.email);
 
-          // Populate department select options
-          $("#editPersonnelDepartment").empty();
-          departmentData.forEach(function (department) {
-            $("#editPersonnelDepartment").append(
-              `<option value="${department.id}">${department.name}</option>`
-            );
+                // Populate department select options
+                $("#editPersonnelDepartment").empty();
+                // store the department options in variable and append at once
+                let option = "";
+                departmentData.forEach(function (department) {
+                  option += `<option value="${department.id}">${department.departmentName}</option>`;
+                });
+                $("#editPersonnelDepartment").html(option);
+                $("#editPersonnelDepartment").val(personnelData.departmentID);
+              } else {
+                console.log("Error: " + response.status.description);
+              }
+            },
           });
-          $("#editPersonnelDepartment").val(personnelData.departmentID);
         } else {
           console.log("Error: " + response.status.description);
         }
@@ -466,20 +481,33 @@ $(document).ready(function () {
       success: function (response) {
         if (response.status.code === "200") {
           let departmentData = response.data;
-          let locationData = response.data.locations;
+          let locationData = [];
 
-          $("#editDepartmentID").val(departmentData.id);
-          $("#editDepartmentName").val(departmentData.name);
+          $.ajax({
+            url: "libs/php/getAllLocations.php",
+            type: "GET",
+            dataType: "json",
+            success: function (response) {
+              if (response.status.code === "200") {
+                locationData = response.data;
+                $("#editDepartmentID").val(departmentData.id);
+                $("#editDepartmentName").val(departmentData.name);
 
-          // Populate location select options
+                // Populate location select options
 
-          $("#editDepartmentLocation").empty();
-          locationData.forEach(function (location) {
-            $("#editDepartmentLocation").append(
-              `<option value="${location.id}">${location.name}</option>`
-            );
+                $("#editDepartmentLocation").empty();
+                // store location options in variable and append at once
+                let locationOption = "";
+                locationData.forEach(function (location) {
+                  locationOption += `<option value="${location.id}">${location.locationName}</option>`;
+                });
+                $("#editDepartmentLocation").html(locationOption);
+                $("#editDepartmentLocation").val(departmentData.locationId);
+              } else {
+                console.log("Error: " + response.status.description);
+              }
+            },
           });
-          $("#editDepartmentLocation").val(departmentData.locationId);
         } else {
           console.log("Error: " + response.status.description);
         }
@@ -765,16 +793,35 @@ $(document).ready(function () {
     // when we click on the delete open modal dialog
     // change remove_modal_title
     // change remove_modal_confirm_button event handler
-    $("#areYouSureDeleteModal")
-      .find("#remove_modal_title")
-      .text("Delete Personnel");
-    $("#areYouSureDeleteModal")
-      .find("#remove_modal_confirm_button")
-      .off("click")
-      .on("click", function () {
-        deletePersonnel(personnelId);
-      });
-    $("#areYouSureDeleteModal").modal("show");
+    $.ajax({
+      url: `libs/php/getPersonnelById.php?id=${personnelId}`,
+      type: "GET",
+      dataType: "json",
+      success: function (response) {
+        if (response.status.code === "200") {
+          let personnelData = response.data.personnel[0];
+
+          $("#areYouSureDeleteModal")
+            .find("#remove_modal_title")
+            .text("Delete Personnel");
+          $("#areYouSureDeleteModal")
+            .find("#remove_modal_confirm_button")
+            .off("click")
+            .on("click", function () {
+              deletePersonnel(personnelId);
+            });
+          $("#areYouSureDeptName").text(
+            `${personnelData?.lastName}, ${personnelData?.firstName}`
+          );
+          $("#areYouSureDeleteModal").modal("show");
+        } else {
+          console.log("Error: " + response.status.description);
+        }
+      },
+      error: function (xhr, status, error) {
+        console.log("Error fetching location info: " + error);
+      },
+    });
   });
 
   function deletePersonnel(personnelId) {
