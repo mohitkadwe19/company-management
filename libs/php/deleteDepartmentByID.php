@@ -33,7 +33,7 @@ if (mysqli_connect_errno()) {
 }
 
 // Check if the department is referenced in the personnel table
-$query = $conn->prepare('SELECT * FROM personnel WHERE departmentID = ?');
+$query = $conn->prepare('SELECT id FROM personnel WHERE departmentID = ?');
 $query->bind_param("i", $_REQUEST['id']);
 $query->execute();
 $result = $query->get_result();

@@ -30,10 +30,24 @@
               <button id="refreshBtn" type="button" class="btn btn-primary">
                 <i class="fa-solid fa-refresh fa-fw"></i>
               </button>
-              <button id="filterBtn" type="button" class="btn btn-primary">
+              <button
+                id="filterBtn"
+                type="button"
+                class="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#filterPersonnelModal"
+                data-id="filterPersonnel"
+              >
                 <i class="fa-solid fa-filter fa-fw"></i>
               </button>
-              <button id="addBtn" type="button" class="btn btn-primary">
+              <button
+                id="addBtn"
+                type="button"
+                class="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#addPersonnelModal"
+                data-id="addPersonnel"
+              >
                 <i class="fa-solid fa-plus fa-fw"></i>
               </button>
             </div>
@@ -727,7 +741,7 @@
       <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content shadow">
           <div class="modal-header bg-danger bg-gradient text-white">
-            <h5 class="modal-title">Error</h5>
+            <h5 class="modal-title" id="error_title">Error</h5>
             <button
               type="button"
               class="btn-close btn-close-white"
