@@ -83,80 +83,120 @@ $(document).ready(function () {
     $("#filterPersonnelLocation").val("");
   });
 
-  // Filter button click handler
-  // Filter button click handler
-  $("#filterBtn").click(function () {
-    // Open filter modal
-    // Implement filter modal opening logic
-    if (activeTab == "personnel") {
-      $("#filterPersonnelModal").modal("show");
-      // fetch department data and add in the select options
-      $.ajax({
-        url: "libs/php/getAllDepartments.php",
-        type: "GET",
-        dataType: "json",
-        success: function (response) {
-          if (response.status.code === "200") {
-            let departmentData = response.data;
-            let html = ""; // Variable to store HTML code
-            html += '<option value="">All</option>'; // Add the "All" option
-            departmentData.forEach(function (department) {
-              html += `<option value="${department.id}">${department.departmentName}</option>`;
-            });
-            $("#filterPersonnelDepartment").html(html); // Append HTML at once
-          } else {
-            console.log("Error: " + response.status.description);
-          }
-        },
-        error: function (xhr, status, error) {
-          console.log("Error: " + error);
-        },
-      });
-
-      // fetch location data and add in the select options
-      $.ajax({
-        url: "libs/php/getAllLocations.php",
-        type: "GET",
-        dataType: "json",
-        success: function (response) {
-          if (response.status.code === "200") {
-            let locationData = response.data;
-            let html = ""; // Variable to store HTML code
-            html += '<option value="">All</option>'; // Add the "All" option
-            locationData.forEach(function (location) {
-              html += `<option value="${location.id}">${location.locationName}</option>`;
-            });
-            $("#filterPersonnelLocation").html(html); // Append HTML at once
-          } else {
-            console.log("Error: " + response.status.description);
-          }
-        },
-        error: function (xhr, status, error) {
-          console.log("Error: " + error);
-        },
-      });
-
-      // Handling the change event for department selection
-      $("#filterPersonnelDepartment").change(function () {
-        if ($(this).val() !== "") {
-          // If department is selected, set location to "All"
-          $("#filterPersonnelLocation").val("");
+  $("#filterPersonnelModal").on("show.bs.modal", function (e) {
+    $.ajax({
+      url: "libs/php/getAllDepartments.php",
+      type: "GET",
+      dataType: "json",
+      success: function (response) {
+        if (response.status.code === "200") {
+          let departmentData = response.data;
+          let html = ""; // Variable to store HTML code
+          html += '<option value="">All</option>'; // Add the "All" option
+          departmentData.forEach(function (department) {
+            html += `<option value="${department.id}">${department.departmentName}</option>`;
+          });
+          $("#filterPersonnelDepartment").html(html); // Append HTML at once
+        } else {
+          console.log("Error: " + response.status.description);
         }
-      });
+      },
+      error: function (xhr, status, error) {
+        console.log("Error: " + error);
+      },
+    });
 
-      // Handling the change event for location selection
-      $("#filterPersonnelLocation").change(function () {
-        if ($(this).val() !== "") {
-          // If location is selected, set department to "All"
-          $("#filterPersonnelDepartment").val("");
+    // fetch location data and add in the select options
+    $.ajax({
+      url: "libs/php/getAllLocations.php",
+      type: "GET",
+      dataType: "json",
+      success: function (response) {
+        if (response.status.code === "200") {
+          let locationData = response.data;
+          let html = ""; // Variable to store HTML code
+          html += '<option value="">All</option>'; // Add the "All" option
+          locationData.forEach(function (location) {
+            html += `<option value="${location.id}">${location.locationName}</option>`;
+          });
+          $("#filterPersonnelLocation").html(html); // Append HTML at once
+        } else {
+          console.log("Error: " + response.status.description);
         }
-      });
-    }
+      },
+      error: function (xhr, status, error) {
+        console.log("Error: " + error);
+      },
+    });
+
+    // Handling the change event for department selection
+    $("#filterPersonnelDepartment").change(function () {
+      if ($(this).val() !== "") {
+        // If department is selected, set location to "All"
+        $("#filterPersonnelLocation").val("");
+      }
+    });
+
+    // Handling the change event for location selection
+    $("#filterPersonnelLocation").change(function () {
+      if ($(this).val() !== "") {
+        // If location is selected, set department to "All"
+        $("#filterPersonnelDepartment").val("");
+      }
+    });
   });
 
-  // Add button click handler
-  $("#addBtn").click(function () {
-    openAddModal(activeTab);
+  $("#addDepartmentModal").on("show.bs.modal", function (e) {
+    let personnelId = $(e.relatedTarget).attr("data-id");
+    // fetch location data and add in the select options
+    $.ajax({
+      url: "libs/php/getAllLocations.php",
+      type: "GET",
+      dataType: "json",
+      success: function (response) {
+        if (response.status.code === "200") {
+          let locationData = response.data;
+          $("#addDepartmentLocation").empty();
+          // store the option in variable and append at once
+          let option = "";
+          locationData.forEach(function (location) {
+            option += `<option value="${location.id}">${location.locationName}</option>`;
+          });
+          $("#addDepartmentLocation").html(option);
+        } else {
+          console.log("Error: " + response.status.description);
+        }
+      },
+      error: function (xhr, status, error) {
+        console.log("Error: " + error);
+      },
+    });
+  });
+
+  $("#addPersonnelModal").on("show.bs.modal", function (e) {
+    // fetch department data and add in the select options
+    $.ajax({
+      url: "libs/php/getAllDepartments.php",
+      type: "GET",
+      dataType: "json",
+      success: function (response) {
+        if (response.status.code === "200") {
+          let departmentData = response.data;
+          $("#addPersonnelDepartment").empty();
+          // store the option into variable and append at once
+          let option = "";
+          departmentData.forEach(function (department) {
+            option += `<option value="${department.id}">${department.departmentName}</option>`;
+          });
+          $("#addPersonnelDepartment").html(option);
+        } else {
+          console.log("Error: " + response.status.description);
+        }
+      },
+      error: function (xhr, status, error) {
+        console.log("Error: " + error);
+      },
+    });
   });
 
   // Tab click handlers
@@ -166,11 +206,21 @@ $(document).ready(function () {
     if (activeTab == "departments") {
       // disable filterBtn when activeTab is departments
       $("#filterBtn").prop("disabled", true);
+      // need to add data attribute to addBtn when activeTab is departments
+      $("#addBtn").attr("data-bs-toggle", "modal");
+      $("#addBtn").attr("data-bs-target", "#addDepartmentModal");
+      $("#addBtn").attr("data-id", "addDepartment");
     } else if (activeTab == "locations") {
       // disable filterBtn when activeTab is locations
       $("#filterBtn").prop("disabled", true);
+      $("#addBtn").attr("data-bs-toggle", "modal");
+      $("#addBtn").attr("data-bs-target", "#addLocationModal");
+      $("#addBtn").attr("data-id", "addLocation");
     } else {
       $("#filterBtn").prop("disabled", false);
+      $("#addBtn").attr("data-bs-toggle", "modal");
+      $("#addBtn").attr("data-bs-target", "#addPersonnelModal");
+      $("#addBtn").attr("data-id", "addPersonnel");
     }
   });
 
@@ -185,78 +235,21 @@ $(document).ready(function () {
     }
   }
 
-  // Function to open add modal
-  function openAddModal(tableName) {
-    if (tableName === "personnel") {
-      $("#addPersonnelModal").modal("show");
-      // fetch department data and add in the select options
-      $.ajax({
-        url: "libs/php/getAllDepartments.php",
-        type: "GET",
-        dataType: "json",
-        success: function (response) {
-          if (response.status.code === "200") {
-            let departmentData = response.data;
-            $("#addPersonnelDepartment").empty();
-            // store the option into variable and append at once
-            let option = "";
-            departmentData.forEach(function (department) {
-              option += `<option value="${department.id}">${department.departmentName}</option>`;
-            });
-            $("#addPersonnelDepartment").html(option);
-          } else {
-            console.log("Error: " + response.status.description);
-          }
-        },
-        error: function (xhr, status, error) {
-          console.log("Error: " + error);
-        },
-      });
-    } else if (tableName === "departments") {
-      $("#addDepartmentModal").modal("show");
-      // fetch location data and add in the select options
-      $.ajax({
-        url: "libs/php/getAllLocations.php",
-        type: "GET",
-        dataType: "json",
-        success: function (response) {
-          if (response.status.code === "200") {
-            let locationData = response.data;
-            $("#addDepartmentLocation").empty();
-            // store the option in variable and append at once
-            let option = "";
-            locationData.forEach(function (location) {
-              option += `<option value="${location.id}">${location.locationName}</option>`;
-            });
-            $("#addDepartmentLocation").html(option);
-          } else {
-            console.log("Error: " + response.status.description);
-          }
-        },
-        error: function (xhr, status, error) {
-          console.log("Error: " + error);
-        },
-      });
-    } else if (tableName === "locations") {
-      $("#addLocationModal").modal("show");
-    }
-  }
-
   // Edit personnel modal show event handler
-  $(document).on("click", ".editPersonnelBtn", function () {
-    let personnelId = $(this).data("id");
+  $("#editPersonnelModal").on("show.bs.modal", function (e) {
+    let personnelId = $(e.relatedTarget).attr("data-id");
     fetchPersonnelData(personnelId);
   });
 
   // Edit department modal show event handler
-  $(document).on("click", ".editDepartmentBtn", function () {
-    let departmentId = $(this).data("id");
+  $("#editDepartmentModal").on("show.bs.modal", function (e) {
+    let departmentId = $(e.relatedTarget).attr("data-id");
     fetchDepartmentData(departmentId);
   });
 
   // Edit location modal show event handler
-  $(document).on("click", ".editLocationBtn", function () {
-    let locationId = $(this).data("id");
+  $("#editLocationModal").on("show.bs.modal", function (e) {
+    let locationId = $(e.relatedTarget).attr("data-id");
     fetchLocationData(locationId);
   });
 
@@ -581,7 +574,11 @@ $(document).ready(function () {
         }
         row +=
           "<td class='align-middle text-nowrap d-none d-md-table-cell'>" +
-          (item.jobTitle ? item.jobTitle : "-") +
+          (item.departmentName ? item.departmentName : "-") +
+          "</td>";
+        row +=
+          "<td class='align-middle text-nowrap d-none d-md-table-cell'>" +
+          (item.locationName ? item.locationName : "-") +
           "</td>";
         row +=
           "<td class='align-middle text-nowrap d-none d-md-table-cell'>" +
@@ -589,11 +586,7 @@ $(document).ready(function () {
           "</td>";
         row +=
           "<td class='align-middle text-nowrap d-none d-md-table-cell'>" +
-          (item.departmentName ? item.departmentName : "-") +
-          "</td>";
-        row +=
-          "<td class='align-middle text-nowrap d-none d-md-table-cell'>" +
-          (item.locationName ? item.locationName : "-") +
+          (item.jobTitle ? item.jobTitle : "-") +
           "</td>";
         row += `
                 <td>
@@ -601,7 +594,7 @@ $(document).ready(function () {
                         <button type="button" class="btn btn-primary btn-sm me-1 editPersonnelBtn" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="${item.id}">
                             <i class="fa-solid fa-pencil fa-fw"></i>
                         </button>
-                        <button type="button" class="btn btn-danger btn-sm me-1 deletePersonnelBtn" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="${item.id}">
+                        <button type="button" class="btn btn-primary btn-sm me-1 deletePersonnelBtn" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="${item.id}">
                             <i class="fa-solid fa-trash fa-fw"></i>
                         </button>
                     </div>
@@ -620,7 +613,7 @@ $(document).ready(function () {
                         <button type="button" class="btn btn-primary btn-sm me-1 editDepartmentBtn" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" data-id="${item.id}">
                             <i class="fa-solid fa-pencil fa-fw"></i>
                         </button>
-                        <button type="button" class="btn btn-danger btn-sm me-1 deleteDepartmentBtn" data-bs-toggle="modal" data-bs-target="#deleteDepartmentModal" data-id="${item.id}">
+                        <button type="button" class="btn btn-primary btn-sm me-1 deleteDepartmentBtn" data-bs-toggle="modal" data-bs-target="#deleteDepartmentModal" data-id="${item.id}">
                             <i class="fa-solid fa-trash fa-fw"></i>
                         </button>
                     </div>
@@ -634,7 +627,7 @@ $(document).ready(function () {
                         <button type="button" class="btn btn-primary btn-sm me-1 editLocationBtn" data-bs-toggle="modal" data-bs-target="#editLocationModal" data-id="${item.id}">
                             <i class="fa-solid fa-pencil fa-fw"></i>
                         </button>
-                        <button type="button" class="btn btn-danger btn-sm me-1 deleteLocationBtn" data-bs-toggle="modal" data-bs-target="#deleteLocationModal" data-id="${item.id}">
+                        <button type="button" class="btn btn-primary btn-sm me-1 deleteLocationBtn" data-bs-toggle="modal" data-bs-target="#deleteLocationModal" data-id="${item.id}">
                             <i class="fa-solid fa-trash fa-fw"></i>
                         </button>
                     </div>
