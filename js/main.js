@@ -83,20 +83,25 @@ $(document).ready(function () {
     $("#filterPersonnelLocation").val("");
   });
 
-  $("#filterPersonnelModal").on("show.bs.modal", function (e) {
+  var currentfilterDepartmentSelect = "";
+  var currentfilterLocationSelect = "";
+
+  // Function to fetch and populate department options
+  function fetchDepartmentsForFilter() {
     $.ajax({
       url: "libs/php/getAllDepartments.php",
       type: "GET",
       dataType: "json",
       success: function (response) {
         if (response.status.code === "200") {
+          console.log(response);
           let departmentData = response.data;
-          let html = ""; // Variable to store HTML code
-          html += '<option value="">All</option>'; // Add the "All" option
+          let html = '<option value="">All</option>';
           departmentData.forEach(function (department) {
             html += `<option value="${department.id}">${department.departmentName}</option>`;
           });
-          $("#filterPersonnelDepartment").html(html); // Append HTML at once
+          $("#filterPersonnelDepartment").html(html);
+          $("#filterPersonnelDepartment").val(currentfilterDepartmentSelect); // Restore the stored value
         } else {
           console.log("Error: " + response.status.description);
         }
@@ -105,8 +110,10 @@ $(document).ready(function () {
         console.log("Error: " + error);
       },
     });
+  }
 
-    // fetch location data and add in the select options
+  // Function to fetch and populate location options
+  function fetchLocations() {
     $.ajax({
       url: "libs/php/getAllLocations.php",
       type: "GET",
@@ -114,12 +121,12 @@ $(document).ready(function () {
       success: function (response) {
         if (response.status.code === "200") {
           let locationData = response.data;
-          let html = ""; // Variable to store HTML code
-          html += '<option value="">All</option>'; // Add the "All" option
+          let html = '<option value="">All</option>';
           locationData.forEach(function (location) {
             html += `<option value="${location.id}">${location.locationName}</option>`;
           });
-          $("#filterPersonnelLocation").html(html); // Append HTML at once
+          $("#filterPersonnelLocation").html(html);
+          $("#filterPersonnelLocation").val(currentfilterLocationSelect); // Restore the stored value
         } else {
           console.log("Error: " + response.status.description);
         }
@@ -128,26 +135,69 @@ $(document).ready(function () {
         console.log("Error: " + error);
       },
     });
+  }
 
-    // Handling the change event for department selection
-    $("#filterPersonnelDepartment").change(function () {
-      if ($(this).val() !== "") {
-        // If department is selected, set location to "All"
-        $("#filterPersonnelLocation").val("");
-      }
-    });
+  // Fetch data and restore select values when the modal is shown
+  $("#filterPersonnelModal").on("show.bs.modal", function (e) {
+    currentfilterDepartmentSelect = $("#filterPersonnelDepartment").val();
+    currentfilterLocationSelect = $("#filterPersonnelLocation").val();
 
-    // Handling the change event for location selection
-    $("#filterPersonnelLocation").change(function () {
-      if ($(this).val() !== "") {
-        // If location is selected, set department to "All"
-        $("#filterPersonnelDepartment").val("");
-      }
+    $.when(fetchDepartmentsForFilter(), fetchLocations()).done(function () {
+      $("#filterPersonnelDepartment").val(currentfilterDepartmentSelect);
+      $("#filterPersonnelLocation").val(currentfilterLocationSelect);
     });
   });
 
+  // Apply filter function
+  function applyFilter() {
+    let formData = {
+      filterDepartment: $("#filterPersonnelDepartment").val(),
+      filterLocation: $("#filterPersonnelLocation").val(),
+    };
+
+    console.log(formData);
+
+    // Make API call to filter personnel data
+    $.ajax({
+      url: "libs/php/filteredPersonnel.php",
+      type: "GET",
+      dataType: "json",
+      data: formData,
+      success: function (response) {
+        if (response.status.code === "200") {
+          // Close the modal or handle success message
+          displayData(response.data.personnel, "personnel");
+        } else {
+          console.log(
+            "Error filtering personnel: " + response.status.description
+          );
+          // Handle error message display or other actions
+        }
+      },
+      error: function (xhr, status, error) {
+        console.log("Error filtering personnel: " + error);
+        // Handle error message display or other actions
+      },
+    });
+  }
+
+  // Apply filter immediately on selection change
+  $("#filterPersonnelDepartment, #filterPersonnelLocation").change(function () {
+    if (
+      $(this).attr("id") === "filterPersonnelDepartment" &&
+      $(this).val() !== ""
+    ) {
+      $("#filterPersonnelLocation").val("");
+    } else if (
+      $(this).attr("id") === "filterPersonnelLocation" &&
+      $(this).val() !== ""
+    ) {
+      $("#filterPersonnelDepartment").val("");
+    }
+    applyFilter();
+  });
+
   $("#addDepartmentModal").on("show.bs.modal", function (e) {
-    let personnelId = $(e.relatedTarget).attr("data-id");
     // fetch location data and add in the select options
     $.ajax({
       url: "libs/php/getAllLocations.php",
@@ -933,39 +983,6 @@ $(document).ready(function () {
       },
       error: function (xhr, status, error) {
         console.log("Error adding personnel: " + error);
-        // Handle error message display or other actions
-      },
-    });
-  });
-
-  $("#filterPersonnelForm").on("submit", function (e) {
-    e.preventDefault();
-    // Gather form data
-    var formData = {
-      filterDepartment: $("#filterPersonnelDepartment").val(),
-      filterLocation: $("#filterPersonnelLocation").val(),
-    };
-
-    // Make API call to filter personnel data
-    $.ajax({
-      url: "libs/php/filteredPersonnel.php",
-      type: "GET",
-      dataType: "json",
-      data: formData,
-      success: function (response) {
-        if (response.status.code === "200") {
-          // Close the modal or handle success message
-          $("#filterPersonnelModal").modal("hide");
-          displayData(response.data.personnel, "personnel");
-        } else {
-          console.log(
-            "Error filtering personnel: " + response.status.description
-          );
-          // Handle error message display or other actions
-        }
-      },
-      error: function (xhr, status, error) {
-        console.log("Error filtering personnel: " + error);
         // Handle error message display or other actions
       },
     });
