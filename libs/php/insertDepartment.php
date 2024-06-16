@@ -1,71 +1,89 @@
 <?php
 
-	// example use from browser
-	// http://localhost/companydirectory/libs/php/insertDepartment.php?name=New%20Department&locationID=<id>
+// example use from browser
+// http://localhost/companydirectory/libs/php/insertDepartment.php?name=New%20Department&locationID=<id>
 
-	// remove next two lines for production
-	
-	ini_set('display_errors', 'On');
-	error_reporting(E_ALL);
+// remove next two lines for production
 
-	$executionStartTime = microtime(true);
-	
-	// this includes the login details
-	
-	include("config.php");
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
 
-	header('Content-Type: application/json; charset=UTF-8');
+$executionStartTime = microtime(true);
 
-	$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
+// this includes the login details
 
-	if (mysqli_connect_errno()) {
-		
-		$output['status']['code'] = "300";
-		$output['status']['name'] = "failure";
-		$output['status']['description'] = "database unavailable";
-		$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-		$output['data'] = [];
+include("config.php");
 
-		mysqli_close($conn);
+header('Content-Type: application/json; charset=UTF-8');
 
-		echo json_encode($output);
+$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 
-		exit;
+if (mysqli_connect_errno()) {
+    
+    $output['status']['code'] = "300";
+    $output['status']['name'] = "failure";
+    $output['status']['description'] = "database unavailable";
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
 
-	}	
+    mysqli_close($conn);
 
-	// SQL statement accepts parameters and so is prepared to avoid SQL injection.
-	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
+    echo json_encode($output);
 
-	$query = $conn->prepare('INSERT INTO department (name, locationID) VALUES(?,?)');
+    exit;
+}
 
-	$query->bind_param("si", $_REQUEST['name'], $_REQUEST['locationID']);
+// Check if the department name already exists
+$checkQuery = $conn->prepare('SELECT id FROM department WHERE name = ?');
+$checkQuery->bind_param("s", $_REQUEST['name']);
+$checkQuery->execute();
+$checkQuery->store_result();
 
-	$query->execute();
-	
-	if (false === $query) {
+if ($checkQuery->num_rows > 0) {
+    // Department name already exists
+    $output['status']['code'] = "409";
+    $output['status']['name'] = "conflict";
+    $output['status']['description'] = "Department name already exists";
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
 
-		$output['status']['code'] = "400";
-		$output['status']['name'] = "executed";
-		$output['status']['description'] = "query failed";	
-		$output['data'] = [];
+    mysqli_close($conn);
 
-		mysqli_close($conn);
+    echo json_encode($output);
 
-		echo json_encode($output); 
+    exit;
+}
 
-		exit;
+// SQL statement accepts parameters and so is prepared to avoid SQL injection.
+// $_REQUEST used for development / debugging. Remember to change to $_POST for production
 
-	}
+$query = $conn->prepare('INSERT INTO department (name, locationID) VALUES (?, ?)');
+$query->bind_param("si", $_REQUEST['name'], $_REQUEST['locationID']); // Assuming locationID is provided in the request
 
-	$output['status']['code'] = "200";
-	$output['status']['name'] = "ok";
-	$output['status']['description'] = "success";
-	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-	$output['data'] = [];
-	
-	mysqli_close($conn);
+$query->execute();
 
-	echo json_encode($output); 
+if ($query === false) {
+
+    $output['status']['code'] = "400";
+    $output['status']['name'] = "executed";
+    $output['status']['description'] = "query failed";    
+    $output['data'] = [];
+
+    mysqli_close($conn);
+
+    echo json_encode($output); 
+
+    exit;
+}
+
+$output['status']['code'] = "200";
+$output['status']['name'] = "ok";
+$output['status']['description'] = "success";
+$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+$output['data'] = [];
+
+mysqli_close($conn);
+
+echo json_encode($output); 
 
 ?>

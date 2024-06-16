@@ -4,7 +4,7 @@
 // http://localhost/companydirectory/libs/php/insertDepartment.php?name=New%20Department&locationID=<id>
 
 // remove next two lines for production
-	
+
 ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
@@ -33,6 +33,27 @@ if (mysqli_connect_errno()) {
     exit;
 }
 
+// Check if the location name already exists
+$checkQuery = $conn->prepare('SELECT id FROM location WHERE name = ?');
+$checkQuery->bind_param("s", $_REQUEST['name']);
+$checkQuery->execute();
+$checkQuery->store_result();
+
+if ($checkQuery->num_rows > 0) {
+    // Location name already exists
+    $output['status']['code'] = "409";
+    $output['status']['name'] = "conflict";
+    $output['status']['description'] = "Location name already exists";
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    $output['data'] = [];
+
+    mysqli_close($conn);
+
+    echo json_encode($output);
+
+    exit;
+}
+
 // SQL statement accepts parameters and so is prepared to avoid SQL injection.
 // $_REQUEST used for development / debugging. Remember to change to $_POST for production
 
@@ -42,7 +63,7 @@ $query->bind_param("s", $_REQUEST['name']); // Adjusted to 's' for string
 
 $query->execute();
 
-if (false === $query) {
+if ($query === false) {
 
     $output['status']['code'] = "400";
     $output['status']['name'] = "executed";
