@@ -29,6 +29,10 @@ $(document).ready(function () {
         displayData(result.data, tableName);
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error searching:", errorThrown);
       },
     });
@@ -49,6 +53,10 @@ $(document).ready(function () {
         displayData(result.data, tableName);
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error searching:", errorThrown);
       },
     });
@@ -69,6 +77,10 @@ $(document).ready(function () {
         displayData(result.data, tableName);
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error searching:", errorThrown);
       },
     });
@@ -107,6 +119,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error: " + error);
       },
     });
@@ -132,6 +148,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error: " + error);
       },
     });
@@ -155,8 +175,6 @@ $(document).ready(function () {
       filterLocation: $("#filterPersonnelLocation").val(),
     };
 
-    console.log(formData);
-
     // Make API call to filter personnel data
     $.ajax({
       url: "libs/php/filteredPersonnel.php",
@@ -175,6 +193,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error filtering personnel: " + error);
         // Handle error message display or other actions
       },
@@ -218,6 +240,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error: " + error);
       },
     });
@@ -244,6 +270,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error: " + error);
       },
     });
@@ -335,6 +365,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error updating personnel data: " + error);
         // Handle error message display or other actions
       },
@@ -370,6 +404,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error updating department data: " + error);
         // Handle error message display or other actions
       },
@@ -404,6 +442,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error updating location data: " + error);
         // Handle error message display or other actions
       },
@@ -423,6 +465,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error: " + error);
       },
     });
@@ -441,6 +487,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error: " + error);
       },
     });
@@ -459,6 +509,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error: " + error);
       },
     });
@@ -509,6 +563,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error: " + error);
       },
     });
@@ -556,6 +614,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error: " + error);
       },
     });
@@ -579,6 +641,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error: " + error);
       },
     });
@@ -736,6 +802,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error fetching department info: " + error);
       },
     });
@@ -759,6 +829,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error deleting department: " + error);
       },
     });
@@ -802,6 +876,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error fetching location info: " + error);
       },
     });
@@ -825,6 +903,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error deleting location: " + error);
       },
     });
@@ -862,6 +944,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error fetching location info: " + error);
       },
     });
@@ -883,6 +969,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error deleting personnel: " + error);
       },
     });
@@ -907,8 +997,16 @@ $(document).ready(function () {
         if (response.status.code === "200") {
           // Close the modal or handle success message
           $("#addDepartmentModal").modal("hide");
+          $("#addDepartmentName").val("");
           refreshTable("departments");
         } else {
+          $("#errorMessageModal")
+            .find("#error_message")
+            .text(`${response.status.description}`);
+          $("#errorMessageModal").modal("show");
+          $("#addDepartmentName").val("");
+          $("#addDepartmentModal").modal("hide");
+          refreshTable("departments");
           console.log(
             "Error adding department: " + response.status.description
           );
@@ -916,6 +1014,10 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error adding department: " + error);
         // Handle error message display or other actions
       },
@@ -939,14 +1041,27 @@ $(document).ready(function () {
       success: function (response) {
         if (response.status.code === "200") {
           // Close the modal or handle success message
+          $("#addLocationName").val("");
           $("#addLocationModal").modal("hide");
           refreshTable("locations");
         } else {
           console.log("Error adding location: " + response.status.description);
+          $("#errorMessageModal")
+            .find("#error_message")
+            .text(`${response.status.description}`);
+          $("#errorMessageModal").modal("show");
+
+          $("#addLocationName").val("");
+          $("#addLocationModal").modal("hide");
+          refreshTable("locations");
           // Handle error message display or other actions
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error adding location: " + error);
         // Handle error message display or other actions
       },
@@ -975,13 +1090,35 @@ $(document).ready(function () {
         if (response.status.code === "200") {
           // Close the modal or handle success message
           $("#addPersonnelModal").modal("hide");
+          $("#addPersonnelFirstName").val("");
+          $("#addPersonnelLastName").val("");
+          $("#addPersonnelJobTitle").val("");
+          $("#addPersonnelEmailAddress").val("");
+          $("#addPersonnelDepartment").val("");
           refreshTable("personnel");
         } else {
+          $("#errorMessageModal")
+            .find("#error_message")
+            .text(`${response.status.description}`);
+          $("#errorMessageModal").modal("show");
+
+          $("#addPersonnelModal").modal("hide");
+          $("#addPersonnelFirstName").val("");
+          $("#addPersonnelLastName").val("");
+          $("#addPersonnelJobTitle").val("");
+          $("#addPersonnelEmailAddress").val("");
+          $("#addPersonnelDepartment").val("");
+          refreshTable("personnel");
+
           console.log("Error adding personnel: " + response.status.description);
           // Handle error message display or other actions
         }
       },
       error: function (xhr, status, error) {
+        $("#errorMessageModal")
+          .find("#error_message")
+          .text(`Something went wrong !`);
+        $("#errorMessageModal").modal("show");
         console.log("Error adding personnel: " + error);
         // Handle error message display or other actions
       },
